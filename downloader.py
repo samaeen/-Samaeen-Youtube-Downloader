@@ -6,47 +6,63 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow ,QFileDialog
 from PyQt5.uic import loadUi
-
+global filesize
+global ytLink
 
 class youtubeDownloader(QMainWindow):
     def __init__(self):
         super(youtubeDownloader, self).__init__()
         loadUi('youtubedownloader.ui', self)
-        try:
-            self.yt = YouTube(self.linkURL.text())
-            self.getTitle(self.yt.title)
-        except Exception as e:
-            print('handled a small error, no big deal.')
-        else:
-            self.videoTitle.setText('Put a valid link')       
-        
+        self.linkURL.textChanged.connect(self.updateWindow)
+        self.count=1
+	
+            
         self.browseButton.clicked.connect(self.selectDir)
         self.downloadButton.clicked.connect(self.download)
 
-
-    def getTitle(self,title):
-    	if title== None:
-    		self.videoTitle.setText('Put a valid link')
-
-    	else:
-    		self.videoTitle.setText(title)
+    def updateWindow(self):
+    	
+    	#self.videoQuality.addItem([self.stream.resolution for self.stream in self.yt.streams.filter(progressive=True).all()])
+    	try:
+    		self.yt = YouTube(self.linkURL.text())
+    		if self.yt.title==None:
+    			print('no title available')
+    			self.videoTitle.setText('Put a valid link')			
+    		else:
+    			self.videoTitle.setText(self.yt.title)
+    			print('title loaded')
+    		
+    	except Exception as e:
+        	self.videoTitle.setText('Put a valid link')
+        	self.progressBar.setValue(0)
+        	print('Something Messy')
 
     def selectDir(self):
     	self.downloadLocation.setText(QFileDialog.getExistingDirectory(self,'Select Directory'))
 
+    def progressCheck(stream = None, chunk = None, file_handle = None, remaining = None):
+    	percent = (100*(file_size-remaining))/file_size
+    	self.progressBar.setValue(percent)
+    	print('FUNCTIONING')
+
 
     def download(self):
+    	self.yt = YouTube(self.linkURL.text(),on_progress_callback=self.progressCheck)
+    	self.stream = self.yt.streams.filter(progressive = True, file_extension = "mp4").first()
+    	filesize=self.stream.filesize
+    	self.stream.download(self.downloadLocation.text())
     	try:
-    		self.stream = self.yt.streams.first()
-    		self.fileSize=self.stream.size()
-    		self.stream.download(self.downloadLocation.text())
-    	except Exception as e:
-    		print('Still Error')
-    	else:
-    		self.videoTitle.setText('Put a valid link')
-    		self.progressBar.setValue(0)
     		
-    	 	
+    		
+    		
+    		#self.length=self.yt.player_config_args['player_response']['videoDetails']['lengthSeconds']
+    		
+    		print('downloading')
+    	except Exception as e:
+    		self.videoTitle.setText('No valid link available')
+    		print('yoooo')
+    	else:
+    		self.videoTitle.setText('Put a valid link')	 	
     	print('shit iz working')
 
 
