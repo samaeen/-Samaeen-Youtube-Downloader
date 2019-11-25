@@ -2,7 +2,7 @@ from pytube import YouTube
 import os
  
 # on_progress_callback takes 4 parameters.
-def progress_Check(stream = None, chunk = None, file_handle = None, remaining = None):
+def progress_Check(stream = None, chunk = None, file_handle = None, remaining = None , time=None):
     #Gets the percentage of the file that has been downloaded.
     percent = (100*(file_size-remaining))/file_size
     print("{:00.0f}% downloaded".format(percent))

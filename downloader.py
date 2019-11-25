@@ -6,7 +6,6 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow ,QFileDialog
 from PyQt5.uic import loadUi
-global filesize
 global ytLink
 
 class youtubeDownloader(QMainWindow):
@@ -40,16 +39,18 @@ class youtubeDownloader(QMainWindow):
     def selectDir(self):
     	self.downloadLocation.setText(QFileDialog.getExistingDirectory(self,'Select Directory'))
 
-    def progressCheck(stream = None, chunk = None, file_handle = None, remaining = None):
-    	percent = (100*(file_size-remaining))/file_size
-    	self.progressBar.setValue(percent)
-    	print('FUNCTIONING')
+    def progressCheck(stream = None, chunk = None, file_handle = None, remaining = None,time =None):
+    	print(str(filesize)+'2')
+    	percent = (100*(int(str(filesize)))-remaining)/int(str(filesize))
+    	print(percent)
 
 
     def download(self):
     	self.yt = YouTube(self.linkURL.text(),on_progress_callback=self.progressCheck)
     	self.stream = self.yt.streams.filter(progressive = True, file_extension = "mp4").first()
+    	global filesize
     	filesize=self.stream.filesize
+    	print(type(filesize))
     	self.stream.download(self.downloadLocation.text())
     	try:
     		
