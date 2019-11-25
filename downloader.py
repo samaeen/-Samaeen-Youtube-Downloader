@@ -39,23 +39,18 @@ class youtubeDownloader(QMainWindow):
     def selectDir(self):
     	self.downloadLocation.setText(QFileDialog.getExistingDirectory(self,'Select Directory'))
 
-    def progressCheck(stream = None, chunk = None, file_handle = None, remaining = None,time =None):
-    	print(str(filesize)+'2')
-    	percent = (100*(int(str(filesize)))-remaining)/int(str(filesize))
-    	print(percent)
+    def progressCheck(self,stream = None, chunk = None, file_handle = None, remaining = None):
+    	percent = (100*(filesize-remaining))/filesize
+    	self.progressBar.setValue(percent)
 
 
     def download(self):
-    	self.yt = YouTube(self.linkURL.text(),on_progress_callback=self.progressCheck)
+    	self.yt = YouTube(url=self.linkURL.text(), defer_prefetch_init=False, on_progress_callback=self.progressCheck, on_complete_callback=None, proxies=None)
     	self.stream = self.yt.streams.filter(progressive = True, file_extension = "mp4").first()
     	global filesize
     	filesize=self.stream.filesize
-    	print(type(filesize))
     	self.stream.download(self.downloadLocation.text())
     	try:
-    		
-    		
-    		
     		#self.length=self.yt.player_config_args['player_response']['videoDetails']['lengthSeconds']
     		
     		print('downloading')
